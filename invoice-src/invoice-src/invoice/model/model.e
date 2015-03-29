@@ -25,10 +25,10 @@ feature {NONE}
 		end
 
 feature {NONE}
-	inventory: MY_BAG[STRING]
+	inventory: INVENTORY[STRING]			 --holds the inventory
 	ordering: ORDER
 	products: SORTED_TWO_WAY_LIST[ STRING ]  --holds the registered product types
-	message: STRING
+	message: STRING							 --holds the string representation of the system
 
 feature -- model operations
 
@@ -45,41 +45,52 @@ feature -- model operations
 
 
 	add_product_update(a_product: STRING; quantity: INTEGER)
+		--adds a given quantity of a product to the inventory
 		require
-			exists: true
+			exists: does_exist( a_product )
 			positive_value: positive_value( quantity )
 		do
 			inventory.extend (a_product, quantity )
+		ensure
+			product_inventory_updated: inventory.has (a_product) and inventory[a_product] >= quantity
 		end
 
 	add_order_update (a_order: ARRAY[ TUPLE[ pid:STRING; no:INTEGER ] ] )
+		--adds an order to ordering and removes the items ordered from the inventory
 		require
-			no_more_ids: true
+			no_more_ids: available_ids
 			non_empty_cart: a_order.count > 0
-			valid_order: true
+			valid_order: is_not_duplicate_products (a_order)
 		local
-			remove: MY_BAG[STRING]
+			remove: INVENTORY[STRING]
 		do
-			remove := a_order
-			ordering.add (sort_order(remove) )
-			inventory.remove_all (remove)
+			remove := a_order						--order into a sub-inventory
+			ordering.add (sort_order(remove) )		--sorts the items in the order and adds it
+			inventory.remove_all (remove)			--removes the order from the inventory
 		end
 
 	invoice_update(order_id: INTEGER)
+		--changes an order from pending to invoiced
 		require
 			valid_id: valid_order_id( order_id )
+			not_invoiced_already: not is_invoiced (order_id)
 		do
 			ordering.invoice (order_id )
+		ensure
+			invoiced: ordering.is_invoiced (order_id)
 		end
 
 	cancel_order_update(order_id: INTEGER)
+		--Cancels an order. Adds the items back to the inventory and makes id available
 		require
 			valid_id: valid_order_id( order_id )
 		local
-			return: MY_BAG[STRING]
+			return: INVENTORY[STRING]
 		do
 			return := ordering.cancel (order_id)
 			inventory.add_all (return)
+		ensure
+			id_becomes_available: not ordering.is_id_valid (order_id)
 		end
 
 	nothing_update
@@ -89,6 +100,7 @@ feature -- model operations
 
 feature -- queries
 	out : STRING
+		--Returns a string representation of the current state of orders and inventory
 		local
 			report, id, product, stock, order, cart, order_state: STRING
 		do
@@ -107,6 +119,8 @@ feature --helper functions for preconditions
 
 	does_exist( product_string: STRING ): BOOLEAN
 		--checks if the product type was registered already
+		require
+			non_empty_string: not product_string.is_empty
 		do
 			Result := products.has (product_string)
 		end
@@ -119,6 +133,8 @@ feature --helper functions for preconditions
 
 	valid_products( a_order: ARRAY[TUPLE[pid: STRING; no: INTEGER]] ): BOOLEAN
 		--checks if each product exists in the inventory
+		require
+			cart_not_empty: a_order.count > 0
 		local
 			i: INTEGER
 		do
@@ -135,6 +151,8 @@ feature --helper functions for preconditions
 
 	valid_quantities( a_order: ARRAY[TUPLE[pid: STRING; no: INTEGER]] ): BOOLEAN
 		--checks if each product exists in the inventory
+		require
+			cart_not_empty: a_order.count > 0
 		local
 			i: INTEGER
 		do
@@ -155,11 +173,15 @@ feature --helper functions for preconditions
 		end
 
 	is_not_duplicate_products( a_order: ARRAY[TUPLE[pid: STRING; no: INTEGER]] ): BOOLEAN
-		--checks for duplicate orders by asserting that number of occurences for each order
-		--is equal to 1
+		--checks for duplicate orders by first putting the order into a bag and the
+		--looping through it and asserting that the quantities inside the bag are equal
+		--to the each item in the order. If there were duplicates then an item quantity
+		--would be greater
+		require
+			cart_not_empty: a_order.count > 0
 		local
 			i: INTEGER
-			che: MY_BAG[ STRING ]
+			che: INVENTORY[ STRING ]
 		do
 			che := a_order
 
@@ -176,6 +198,8 @@ feature --helper functions for preconditions
 
 	enough_in_stock( a_order: ARRAY[TUPLE[pid: STRING; no: INTEGER]] ): BOOLEAN
 		--checks if there is enough quantities in stock
+		require
+			cart_not_empty: a_order.count > 0
 		local
 			i: INTEGER
 		do
@@ -191,22 +215,30 @@ feature --helper functions for preconditions
 		end
 
 	valid_order_id( id: INTEGER ): BOOLEAN
+		--Checks if this id is being used
+		require
+			id > 0
 		do
 			Result := ordering.is_id_valid (id)
 		end
 
 	is_invoiced( id: INTEGER ): BOOLEAN
+		--Checks if an order with id has been invoiced
+		require
+			id > 0 and valid_order_id( id )
 		do
 			Result := ordering.is_invoiced (id)
 		end
 
 	set_message( m: ERROR_MESSAGES)
+		--Sets the report message
 		do
 			message := m.out
 		end
 
 feature{NONE} --helper functions for string output
 	out_product: STRING
+		--Returns a string representation of all the product types
 		do
 			Result := ""
 
@@ -225,6 +257,7 @@ feature{NONE} --helper functions for string output
 		end
 
 	out_stock: STRING
+		--returns a string representation all the items in the inventory
 		local
 			int: INTEGER
 			dom: ARRAY[STRING]
@@ -246,7 +279,8 @@ feature{NONE} --helper functions for string output
 			end
 		end
 
-	sort_order( in: MY_BAG[STRING] ):ARRAY[TUPLE[STRING,INTEGER]]
+	sort_order( in: INVENTORY[STRING] ):ARRAY[TUPLE[STRING,INTEGER]]
+		--Return an array of sorted items. This is used to sort an order
 		local
 			sor: ARRAY[STRING]
 			int: INTEGER

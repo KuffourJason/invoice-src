@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {ERROR_MESSAGES}."
+	description: "This class handles generating the all error messages related to the system"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -119,15 +119,5 @@ feature {NONE} -- Implementation
 	err_not_enough: INTEGER = 10
 	err_invalid_id: INTEGER = 11
 	err_invoiced: INTEGER = 12
-
-
-	valid_message(a_message_no:INTEGER): BOOLEAN
-		do
-			Result := err_message.lower <= a_message_no
-				and a_message_no <= err_message.upper
-		ensure
-			Result =( err_message.lower <= a_message_no
-				and a_message_no <= err_message.upper)
-		end
 
 end

@@ -22,6 +22,10 @@ feature -- command
 				create m.make_positive_quantity
 				model.set_message (m)
 
+			elseif a_product.is_empty then				--Checks for empty string
+				create m.make_not_exists
+				model.set_message (m)
+
 			elseif not model.does_exist (a_product) then  --Checks if the product was registered first
 				create m.make_not_exists
 				model.set_message (m)

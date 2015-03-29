@@ -1,13 +1,13 @@
 note
-	description: "Summary description for {MY_BAG}."
+	description: "Summary description for {INVENTORY}."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 class
-	MY_BAG[G -> {HASHABLE, COMPARABLE}]
+	INVENTORY[G -> {HASHABLE, COMPARABLE}]
 inherit
-	ADT_BAG[G]
+	ADT_INVENTORY[G]
 
 create
 	make_empty,
@@ -170,7 +170,7 @@ feature --queries
 			end
 		end
 
-	new_cursor: MY_BAG_ITERATION_CURSOR [G] -- (from ITERABLE)
+	new_cursor: INVENTORY_ITERATION_CURSOR [G] -- (from ITERABLE)
 		do
 			create Result.make(bag)
 		end
@@ -186,44 +186,30 @@ feature --queries
 feature {NONE} --helpers
 	sort( in:ARRAY[G] ): ARRAY[G]
 		local
-			index1: INTEGER
-			index2: INTEGER
-			sorted: ARRAY[G]
-			done: ARRAY[INTEGER]
-			store: INTEGER
-			curr: G
+			srt: SORTED_TWO_WAY_LIST[ G ]
+			int: INTEGER
 		do
-			create sorted.make_empty
-			create done.make_empty
+			create srt.make
+			create Result.make_empty
+			srt.compare_objects
 
 			from
-				index1 := 1
+				int := 1
 			until
-				index1 > in.count
+				int > in.count
 			loop
-				curr := in[1]
-				store := 1
-
-				from
-					index2 := 1
-				until
-					index2 > in.count
-				loop
-					if in[index2] < curr and not done.has (index2) or (done.has (store)  and in[index2] > curr)  then
-						curr := in[index2]
-						store := index2
-					end
-					if index2 = in.count and not done.has (store) then
-						done.force (store, index1)
-					end
-
-					index2 := index2 + 1
-				end
-
-				sorted.force (curr, index1)
-				index1 := index1 + 1
+				srt.force (in[int] )
+				int := int + 1
 			end
-			Result := sorted
+
+			from
+				int := 1
+			until
+				int > srt.count
+			loop
+				Result.force (srt.at (int), int)
+				int := int + 1
+			end
 		end
 
 end
