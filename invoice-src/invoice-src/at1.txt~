@@ -1,0 +1,11 @@
+->add_type("nuts")
+->nothing
+->add_type("bolts")
+->add_type("hammers")
+->add_type("nuts")
+->add_product("bolts",100)
+->add_product("nuts",200) 
+->add_order(<<["nuts", 25], ["bolts", 15]>>)
+->invoice(1)
+->invoice(2)
+
