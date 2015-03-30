@@ -1,11 +1,11 @@
 note
-	description: "Summary description for {MY_BAG_ITERATION_CURSOR}."
+	description: "Summary description for {MY_BAG_ITERATION_CURSOR}." -- #####INVENTORY_ITERATION_CURSOR  
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 class
-	MY_BAG_ITERATION_CURSOR[G -> {HASHABLE, COMPARABLE} ]
+	MY_BAG_ITERATION_CURSOR[G -> {HASHABLE, COMPARABLE} ]  -- #####INVENTORY_ITERATION_CURSOR  
 inherit
 	ITERATION_CURSOR[G]
 
