@@ -1,11 +1,11 @@
 note
-	description: "Summary description for {ADT_BAG}."
+	description: "Summary description for {ADT_BAG}." -- ######change to ADT_INVENTORY
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 deferred class
-	ADT_BAG [G -> {HASHABLE, COMPARABLE}]
+	ADT_BAG [G -> {HASHABLE, COMPARABLE}] -- ######change to ADT_INVENTORY
 inherit
 	ITERABLE[G]
 
