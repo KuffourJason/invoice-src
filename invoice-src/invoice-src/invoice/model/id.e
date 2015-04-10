@@ -18,6 +18,8 @@ feature{ORDER}
 			next_available := 1
 			create available.make (0)
 			create sequence.make(0)
+			sequence.compare_objects
+			available.compare_objects
 		end
 
 feature{NONE}
@@ -52,7 +54,7 @@ feature{ORDER}
 		do
 			available.force (id)
 			ids.at (id) := 0
-			sequence.prune(id)
+			sequence.prune_all (id)
 		ensure
 			ids.at (id) = 0 and not sequence.has (id) and available.has (id)
 		end

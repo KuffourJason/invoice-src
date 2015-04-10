@@ -17,9 +17,13 @@ feature -- command
     	do
 			create m.make_ok
 
-			if model.positive_value (order_id) and not model.valid_order_id (order_id) then   --Checks if an order with id exists
+			if not model.positive_value (order_id)  then		-- checks if the order_id exists
 				create m.make_invalid_id
 				model.set_message (m)
+
+			elseif not model.valid_order_id (order_id) then		-- checks if the order_id exists
+				create m.make_invalid_id
+				model.set_message (m) 
 
 			else
 				model.set_message (m)

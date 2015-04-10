@@ -216,16 +216,14 @@ feature --helper functions for preconditions
 
 	valid_order_id( id: INTEGER ): BOOLEAN
 		--Checks if this id is being used
-		require
-			id > 0
 		do
-			Result := ordering.is_id_valid (id)
+			Result :=  ordering.is_id_valid (id)
 		end
 
 	is_invoiced( id: INTEGER ): BOOLEAN
 		--Checks if an order with id has been invoiced
 		require
-			id > 0 and valid_order_id( id )
+			valid_order_id( id )
 		do
 			Result := ordering.is_invoiced (id)
 		end

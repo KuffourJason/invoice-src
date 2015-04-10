@@ -64,8 +64,6 @@ feature{ MODEL}
 
 	is_id_valid(id: INTEGER): BOOLEAN
 		--determines if the id is valid i.e whether it exists or not
-		require
-			positive_id: id > 0
 		do
 			Result := id_gen.valid_id (id)
 		end

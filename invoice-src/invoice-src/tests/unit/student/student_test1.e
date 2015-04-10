@@ -138,6 +138,7 @@ feature
 			check not Result end
 
 			m.m.invoice_update (1)
+			--m.m.invoice_update (0)
 
 			Result := m.m.is_invoiced (1)
 			check Result end
